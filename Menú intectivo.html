@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fulano Food - Menú Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --primary: #fbbf24;
+  --primary-dark: #f59e0b;
+  --secondary: #1f2937;
+  --dark: #111827;
+  --dark-light: #1f2937;
+  --light: #f3f4f6;
+  --success: #10b981;
+  --danger: #ef4444;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--dark);
+  color: var(--light);
+  padding-bottom: 120px;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--secondary), var(--dark));
+  padding: 30px 20px;
+  text-align: center;
+  border-bottom: 3px solid var(--primary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 8px;
+  font-weight: 800;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.header p {
+  color: var(--light);
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.categories {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  background: var(--secondary);
+  position: sticky;
+  top: 95px;
+  z-index: 99;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.categories::-webkit-scrollbar {
+  height: 4px;
+}
+
+.categories::-webkit-scrollbar-track {
+  background: var(--dark);
+}
+
+.categories::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+.category-btn {
+  padding: 10px 20px;
+  background: var(--dark-light);
+  border: 2px solid transparent;
+  border-radius: 25px;
+  color: var(--light);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+
+.category-btn:hover {
+  background: var(--primary);
+  color: var(--dark);
+  transform: translateY(-2px);
+}
+
+.category-btn.active {
+  background: var(--primary);
+  color: var(--dark);
+  border-color: var(--primary-dark);
+}
+
+.menu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.category-section {
+  margin-bottom: 40px;
+}
+
+.category-title {
+  color: var(--primary);
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 10px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: var(--secondary);
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.product-card:hover::before {
+  left: 100%;
+}
+
+.product-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+}
+
+.product-image {
+  width: 100%;
+  height: 120px;
+  background: var(--dark);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.product-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--light);
+  margin-bottom: 12px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.product-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.product-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.add-btn {
+  padding: 10px 25px;
+  background: var(--primary);
+  color: var(--dark);
+  border: none;
+  border-radius: 25px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+}
+
+.add-btn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
+}
+
+.add-btn:active {
+  transform: scale(0.95);
+}
+
+.cart-button {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: var(--dark);
+  padding: 18px 40px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(251, 191, 36, 0.5);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.cart-button:hover {
+  transform: translateX(-50%) translateY(-3px);
+  box-shadow: 0 12px 40px rgba(251, 191, 36, 0.7);
+}
+
+.cart-count {
+  background: var(--dark);
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.cart-total {
+  font-weight: 800;
+}
+
+.cart-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+}
+
+.cart-modal.active {
+  display: flex;
+  align-items: flex-end;
+}
+
+.cart-content {
+  background: var(--secondary);
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 30px 30px 0 0;
+  padding: 30px 20px;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--primary);
+}
+
+.cart-header h2 {
+  color: var(--primary);
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.close-cart {
+  background: var(--dark);
+  color: var(--light);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-cart:hover {
+  background: var(--danger);
+  transform: rotate(90deg);
+}
+
+.cart-items {
+  margin-bottom: 25px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: var(--dark);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.cart-item-name {
+  font-weight: 700;
+  color: var(--light);
+  margin-bottom: 5px;
+}
+
+.cart-item-price {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.qty-btn {
+  background: var(--primary);
+  color: var(--dark);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.1rem;
+}
+
+.qty-btn:hover {
+  transform: scale(1.1);
+}
+
+.cart-item-qty {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 30px;
+  text-align: center;
+}
+
+.remove-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+}
+
+.cart-summary {
+  background: var(--dark);
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.cart-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.cart-summary-row.total {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  padding-top: 15px;
+  border-top: 2px solid var(--primary);
+  margin-top: 15px;
+}
+
+.whatsapp-btn {
+  width: 100%;
+  padding: 18px;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.whatsapp-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 40px 20px;
+  color: #9ca3af;
+}
+
+.empty-cart-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cart-button {
+    padding: 15px 30px;
+    font-size: 1rem;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>🍔 Fulano Food</h1>
+  <p>Ordena tu comida favorita online</p>
+</div>
+
+<div class="categories" id="categories"></div>
+
+<div class="menu-container" id="menuContainer"></div>
+
+<button class="cart-button" id="cartButton" onclick="toggleCart()">
+  <span>🛒</span>
+  <span>Ver Carrito</span>
+  <span class="cart-count" id="cartCount">0</span>
+  <span class="cart-total" id="cartButtonTotal">RD$0</span>
+</button>
+
+<div class="cart-modal" id="cartModal">
+  <div class="cart-content">
+    <div class="cart-header">
+      <h2>Tu Pedido</h2>
+      <button class="close-cart" onclick="toggleCart()">×</button>
+    </div>
+    
+    <div id="cartItemsContainer"></div>
+
+    <div class="cart-summary" id="cartSummary" style="display: none;">
+      <div class="cart-summary-row">
+        <span>Subtotal:</span>
+        <span id="subtotal">RD$0</span>
+      </div>
+      <div class="cart-summary-row">
+        <span>Envío:</span>
+        <span id="delivery">RD$50</span>
+      </div>
+      <div class="cart-summary-row total">
+        <span>Total:</span>
+        <span id="total">RD$0</span>
+      </div>
+    </div>
+
+    <button class="whatsapp-btn" id="whatsappBtn" onclick="sendToWhatsApp()" style="display: none;">
+      <span>💬</span>
+      <span>Ordenar por WhatsApp</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  businessName: "Brothers' Burgers",
+  whatsapp: "18095238412",
+  currency: "RD$",
+  deliveryFee: 50,
+  categories: [
+    { id: "hamburguesas", name: "🍔 Hamburguesas" },
+    { id: "sandwiches", name: "🥪 Sandwiches" },
+    { id: "burritos", name: "🌯 Burritos" },
+    { id: "grills", name: "🍗 Grills" },
+    { id: "tacos", name: "🌮 Tacos/Quesadillas" },
+    { id: "tostadas", name: "🍞 Tostadas" },
+    { id: "combroths", name: "🍟 Combroths" },
+    { id: "yaroas", name: "🥔 Yaroas" },
+    { id: "adicionales", name: "➕ Adicionales" }
+  ],
+  products: [
+    // HAMBURGUESAS
+    { id: 1, name: "Hamburguesa Clásica", price: 175, category: "hamburguesas", emoji: "🍔" },
+    { id: 2, name: "Cheeseburger", price: 225, category: "hamburguesas", emoji: "🧀" },
+    { id: 3, name: "Bacon Cheese", price: 250, category: "hamburguesas", emoji: "🥓" },
+    { id: 4, name: "Baconazo", price: 300, category: "hamburguesas", emoji: "🥓" },
+    { id: 5, name: "Baconazo 2ble", price: 375, category: "hamburguesas", emoji: "🥓" },
+    { id: 6, name: "Cheeseburger Pechuga", price: 275, category: "hamburguesas", emoji: "🐔" },
+    { id: 7, name: "Cheeseburger 2ble", price: 325, category: "hamburguesas", emoji: "🧀" },
+    { id: 8, name: "Bacon Cheese 2ble", price: 350, category: "hamburguesas", emoji: "🥓" },
+    { id: 9, name: "Bacon Cheese Full", price: 400, category: "hamburguesas", emoji: "🥓" },
+
+    // SANDWICHES
+    { id: 10, name: "Sandwich Jamón y Queso", price: 150, category: "sandwiches", emoji: "🥪" },
+    { id: 11, name: "Sandwich Derretido Queso", price: 160, category: "sandwiches", emoji: "🧀" },
+    { id: 12, name: "Sandwich Queso Danés", price: 175, category: "sandwiches", emoji: "🧀" },
+    { id: 13, name: "Sandwich Pollo-Jamón-Queso", price: 225, category: "sandwiches", emoji: "🐔" },
+    { id: 14, name: "Sandwich Pollo-Danés", price: 250, category: "sandwiches", emoji: "🐔" },
+    { id: 15, name: "Sandwich Jamón-Queso-Res", price: 275, category: "sandwiches", emoji: "🥩" },
+    { id: 16, name: "Cubano Pollo-Jamón-Queso", price: 250, category: "sandwiches", emoji: "🥪" },
+    { id: 17, name: "Cubano Res-Jamón-Queso", price: 275, category: "sandwiches", emoji: "🥩" },
+    { id: 18, name: "Cubano Pollo-Danés", price: 285, category: "sandwiches", emoji: "🐔" },
+    { id: 19, name: "Club Sandwich Pollo", price: 300, category: "sandwiches", emoji: "🐔" },
+    { id: 20, name: "Club Sandwich Res", price: 385, category: "sandwiches", emoji: "🥩" },
+    { id: 21, name: "Club Sandwich Mixto", price: 400, category: "sandwiches", emoji: "🥪" },
+
+    // BURRITOS
+    { id: 22, name: "Burrito Pollo", price: 225, category: "burritos", emoji: "🌯" },
+    { id: 23, name: "Burrito Pollo Mozzarella", price: 275, category: "burritos", emoji: "🌯" },
+    { id: 24, name: "Burrito Pollo 2ble Queso", price: 250, category: "burritos", emoji: "🌯" },
+    { id: 25, name: "Burrito Res", price: 260, category: "burritos", emoji: "🌯" },
+    { id: 26, name: "Burrito Res Mozzarella", price: 300, category: "burritos", emoji: "🌯" },
+    { id: 27, name: "Burrito Res 2ble Queso", price: 285, category: "burritos", emoji: "🌯" },
+    { id: 28, name: "Burrito Mixto", price: 285, category: "burritos", emoji: "🌯" },
+    { id: 29, name: "Burrito Mixto Mozzarella", price: 325, category: "burritos", emoji: "🌯" },
+    { id: 30, name: "Burrito Mixto 2ble Queso", price: 300, category: "burritos", emoji: "🌯" },
+    { id: 31, name: "Burrito Brothers Pollo", price: 350, category: "burritos", emoji: "🌯" },
+    { id: 32, name: "Burrito Brothers Res", price: 365, category: "burritos", emoji: "🌯" },
+    { id: 33, name: "Burrito Brothers Mixto", price: 385, category: "burritos", emoji: "🌯" },
+    { id: 34, name: "Bacon Wrap Chicken", price: 275, category: "burritos", emoji: "🥓" },
+    { id: 35, name: "Bacon Wrap Chicken Danés", price: 300, category: "burritos", emoji: "🥓" },
+
+    // GRILLS
+    { id: 36, name: "Pechuga a la Plancha", price: 350, category: "grills", emoji: "🍗" },
+    { id: 37, name: "Pechuga a la BBQ", price: 350, category: "grills", emoji: "🍗" },
+    { id: 38, name: "Alitas Fritas", price: 350, category: "grills", emoji: "🍗" },
+    { id: 39, name: "Alitas BBQ", price: 350, category: "grills", emoji: "🍗" },
+    { id: 40, name: "Alitas Picantes BBQ", price: 325, category: "grills", emoji: "🍗" },
+    { id: 41, name: "Salchichas Alemanas (Piggylinks)", price: 250, category: "grills", emoji: "🌭" },
+    { id: 42, name: "Longaniza Artesanal", price: 250, category: "grills", emoji: "🌭" },
+
+    // TACOS Y QUESADILLAS
+    { id: 43, name: "Tacos Pollo", price: 135, category: "tacos", emoji: "🌮" },
+    { id: 44, name: "Tacos Res", price: 150, category: "tacos", emoji: "🌮" },
+    { id: 45, name: "Tacos Mixto", price: 175, category: "tacos", emoji: "🌮" },
+    { id: 46, name: "Tacos Mixto Bacon Danés", price: 225, category: "tacos", emoji: "🌮" },
+    { id: 47, name: "Quesadilla Pollo", price: 225, category: "tacos", emoji: "🧀" },
+    { id: 48, name: "Quesadilla Res", price: 260, category: "tacos", emoji: "🧀" },
+    { id: 49, name: "Quesadilla Mixta", price: 285, category: "tacos", emoji: "🧀" },
+
+    // TOSTADAS
+    { id: 50, name: "Tostada Jamón-Queso", price: 75, category: "tostadas", emoji: "🍞" },
+    { id: 51, name: "Tostada 2 Jamón-Queso", price: 95, category: "tostadas", emoji: "🍞" },
+    { id: 52, name: "Tostada Longaniza", price: 150, category: "tostadas", emoji: "🍞" },
+    { id: 53, name: "Tostada Huevo", price: 95, category: "tostadas", emoji: "🍳" },
+    { id: 54, name: "Tostada Pollo", price: 150, category: "tostadas", emoji: "🍞" },
+    { id: 55, name: "Tostada Res", price: 175, category: "tostadas", emoji: "🍞" },
+    { id: 56, name: "Tostada Plancha", price: 150, category: "tostadas", emoji: "🍞" },
+    { id: 57, name: "Tostada Bacon Queso", price: 125, category: "tostadas", emoji: "🍞" },
+
+    // COMBROTHS
+    { id: 58, name: "Hot Dog", price: 150, category: "combroths", emoji: "🌭" },
+    { id: 59, name: "Hot Dog Pollo", price: 175, category: "combroths", emoji: "🌭" },
+    { id: 60, name: "Burrito Pollo-Papa", price: 300, category: "combroths", emoji: "🌯" },
+    { id: 61, name: "Burrito Res-Papa", price: 350, category: "combroths", emoji: "🌯" },
+    { id: 62, name: "Burrito Mixto-Papa", price: 375, category: "combroths", emoji: "🌯" },
+    { id: 63, name: "Quesadilla Pollo-Papa", price: 300, category: "combroths", emoji: "🧀" },
+    { id: 64, name: "Quesadilla Res-Papa", price: 350, category: "combroths", emoji: "🧀" },
+    { id: 65, name: "Quesadilla Mixta-Papa", price: 375, category: "combroths", emoji: "🧀" },
+    { id: 66, name: "2 Tacos Pollo-Papa", price: 300, category: "combroths", emoji: "🌮" },
+    { id: 67, name: "2 Tacos Res-Papa", price: 325, category: "combroths", emoji: "🌮" },
+    { id: 68, name: "2 Tacos Mixto-Papa", price: 350, category: "combroths", emoji: "🌮" },
+    { id: 69, name: "Hamburger-Papa", price: 225, category: "combroths", emoji: "🍔" },
+    { id: 70, name: "Cheeseburger-Papa", price: 250, category: "combroths", emoji: "🍔" },
+    { id: 71, name: "Bacon Cheeseburger-Papa", price: 300, category: "combroths", emoji: "🍔" },
+    { id: 72, name: "Baconazo-Papa", price: 375, category: "combroths", emoji: "🍔" },
+    { id: 73, name: "Cheeseburger 2ble-Papa", price: 375, category: "combroths", emoji: "🍔" },
+    { id: 74, name: "Bacon Cheese Full-Papa", price: 475, category: "combroths", emoji: "🍔" },
+    { id: 75, name: "Salchipapas", price: 250, category: "combroths", emoji: "🌭" },
+
+    // YAROAS
+    { id: 76, name: "Yaroa Pollo G", price: 300, category: "yaroas", emoji: "🥔" },
+    { id: 77, name: "Yaroa Pollo P", price: 200, category: "yaroas", emoji: "🥔" },
+    { id: 78, name: "Yaroa Pollo M", price: 250, category: "yaroas", emoji: "🥔" },
+    { id: 79, name: "Yaroa Res G", price: 350, category: "yaroas", emoji: "🥔" },
+    { id: 80, name: "Yaroa Res P", price: 225, category: "yaroas", emoji: "🥔" },
+    { id: 81, name: "Yaroa Res M", price: 265, category: "yaroas", emoji: "🥔" },
+    { id: 82, name: "Yaroa Mixta G", price: 375, category: "yaroas", emoji: "🥔" },
+    { id: 83, name: "Yaroa Mixta P", price: 250, category: "yaroas", emoji: "🥔" },
+    { id: 84, name: "Yaroa Mixta M", price: 300, category: "yaroas", emoji: "🥔" },
+    { id: 85, name: "Yaroa Bacon Pollo", price: 350, category: "yaroas", emoji: "🥔" },
+    { id: 86, name: "Yaroa Bacon Res", price: 385, category: "yaroas", emoji: "🥔" },
+    { id: 87, name: "Yaroa Bacon Mixta", price: 425, category: "yaroas", emoji: "🥔" },
+    { id: 88, name: "Yaroa Pepperoni Pollo", price: 350, category: "yaroas", emoji: "🥔" },
+    { id: 89, name: "Yaroa Pepperoni Res", price: 385, category: "yaroas", emoji: "🥔" },
+    { id: 90, name: "Yaroa Pepperoni Mixta", price: 425, category: "yaroas", emoji: "🥔" },
+    { id: 91, name: "Yaroa PL Pollo G", price: 350, category: "yaroas", emoji: "🥔" },
+    { id: 92, name: "Yaroa PL Pollo P", price: 250, category: "yaroas", emoji: "🥔" },
+    { id: 93, name: "Yaroa PL Pollo M", price: 285, category: "yaroas", emoji: "🥔" },
+    { id: 94, name: "Yaroa PL Res G", price: 365, category: "yaroas", emoji: "🥔" },
+    { id: 95, name: "Yaroa PL Res P", price: 265, category: "yaroas", emoji: "🥔" },
+    { id: 96, name: "Yaroa PL Res M", price: 300, category: "yaroas", emoji: "🥔" },
+    { id: 97, name: "Yaroa PL Mixta G", price: 375, category: "yaroas", emoji: "🥔" },
+    { id: 98, name: "Yaroa PL Mixta P", price: 275, category: "yaroas", emoji: "🥔" },
+    { id: 99, name: "Yaroa PL Mixta M", price: 325, category: "yaroas", emoji: "🥔" },
+
+    // ADICIONALES
+    { id: 100, name: "Papa con Queso Bacon", price: 235, category: "adicionales", emoji: "🍟" },
+    { id: 101, name: "Papa con Queso Pequeño", price: 135, category: "adicionales", emoji: "🍟" },
+    { id: 102, name: "Papa con Queso Grande", price: 190, category: "adicionales", emoji: "🍟" },
+    { id: 103, name: "Servicio Papa", price: 175, category: "adicionales", emoji: "🍟" },
+    { id: 104, name: "Batida Fresa", price: 75, category: "adicionales", emoji: "🥤" },
+    { id: 105, name: "Jugos Naturales", price: 75, category: "adicionales", emoji: "🧃" },
+      { id: 107, name: "Agua", price: 20, category: "adicionales", emoji: "💧" }
+  ]
+};
+
+let cart = [];
+let activeCategory = "all";
+
+function renderCategories() {
+  const container = document.getElementById('categories');
+  let html = '<button class="category-btn active" onclick="filterCategory(\'all\')">Todos</button>';
+  
+  CONFIG.categories.forEach(cat => {
+    html += `<button class="category-btn" onclick="filterCategory('${cat.id}')">${cat.name}</button>`;
+  });
+  
+  container.innerHTML = html;
+}
+
+function renderMenu(filterCat = 'all') {
+  const container = document.getElementById('menuContainer');
+  let html = '';
+  
+  const categories = filterCat === 'all' ? CONFIG.categories : CONFIG.categories.filter(c => c.id === filterCat);
+  
+  categories.forEach(cat => {
+    const products = CONFIG.products.filter(p => p.category === cat.id);
+    
+    if (products.length > 0) {
+      html += `
+        <div class="category-section">
+          <h2 class="category-title">${cat.name}</h2>
+          <div class="products-grid">
+      `;
+      
+      products.forEach(product => {
+        html += `
+          <div class="product-card">
+            <div class="product-image">${product.emoji}</div>
+            <div class="product-name">${product.name}</div>
+            <div class="product-footer">
+              <div class="product-price">${CONFIG.currency}${product.price}</div>
+              <button class="add-btn" onclick="addToCart(${product.id})">Agregar</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `
+          </div>
+        </div>
+      `;
+    }
+  });
+  
+  container.innerHTML = html;
+}
+
+function filterCategory(categoryId) {
+  activeCategory = categoryId;
+  
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  renderMenu(categoryId);
+}
+
+function renderCart() {
+  const container = document.getElementById('cartItemsContainer');
+  
+  if (cart.length === 0) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <p>Tu carrito está vacío</p>
+        <p style="font-size: 0.9rem; margin-top: 10px;">¡Agrega algunos productos deliciosos!</p>
+      </div>
+    `;
+    document.getElementById('cartSummary').style.display = 'none';
+    document.getElementById('whatsappBtn').style.display = 'none';
+    return;
+  }
+  
+  let html = '<div class="cart-items">';
+  
+  cart.forEach(item => {
+    const product = CONFIG.products.find(p => p.id === item.id);
+    const itemTotal = product.price * item.quantity;
+    
+    html += `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <div class="cart-item-name">${product.emoji} ${product.name}</div>
+          <div class="cart-item-price">${CONFIG.currency}${product.price} c/u</div>
+        </div>
+        <div class="cart-item-controls">
+          <button class="qty-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">−</button>
+          <span class="cart-item-qty">${item.quantity}</span>
+          <button class="qty-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+          <button class="remove-btn" onclick="removeFromCart(${item.id})">🗑️</button>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+  
+  document.getElementById('cartSummary').style.display = 'block';
+  document.getElementById('whatsappBtn').style.display = 'flex';
+  
+  updateTotals();
+}
+
+function addToCart(productId) {
+  const existingItem = cart.find(item => item.id === productId);
+  
+  if (existingItem) {
+    existingItem.quantity++;
+  } else {
+    cart.push({ id: productId, quantity: 1 });
+  }
+  
+  updateCartButton();
+  
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = '✓ Agregado';
+  btn.style.background = 'var(--success)';
+  btn.style.color = 'white';
+  
+  setTimeout(() => {
+    btn.textContent = originalText;
+    btn.style.background = 'var(--primary)';
+    btn.style.color = 'var(--dark)';
+  }, 800);
+}
+
+function updateQuantity(productId, newQuantity) {
+  if (newQuantity <= 0) {
+    removeFromCart(productId);
+    return;
+  }
+  
+  const item = cart.find(item => item.id === productId);
+  if (item) {
+    item.quantity = newQuantity;
+    renderCart();
+    updateCartButton();
+  }
+}
+
+function removeFromCart(productId) {
+  cart = cart.filter(item => item.id !== productId);
+  renderCart();
+  updateCartButton();
+}
+
+function updateCartButton() {
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cart.reduce((sum, item) => {
+    const product = CONFIG.products.find(p => p.id === item.id);
+    return sum + (product.price * item.quantity);
+  }, 0);
+  
+  document.getElementById('cartCount').textContent = totalItems;
+  document.getElementById('cartButtonTotal').textContent = `${CONFIG.currency}${totalPrice}`;
+}
+
+function updateTotals() {
+  const subtotal = cart.reduce((sum, item) => {
+    const product = CONFIG.products.find(p => p.id === item.id);
+    return sum + (product.price * item.quantity);
+  }, 0);
+  
+  const total = subtotal + CONFIG.deliveryFee;
+  
+  document.getElementById('subtotal').textContent = `${CONFIG.currency}${subtotal}`;
+  document.getElementById('delivery').textContent = `${CONFIG.currency}${CONFIG.deliveryFee}`;
+  document.getElementById('total').textContent = `${CONFIG.currency}${total}`;
+}
+
+function toggleCart() {
+  const modal = document.getElementById('cartModal');
+  modal.classList.toggle('active');
+  
+  if (modal.classList.contains('active')) {
+    renderCart();
+  }
+}
+
+document.getElementById('cartModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    toggleCart();
+  }
+});
+
+function sendToWhatsApp() {
+  if (cart.length === 0) return;
+  
+  let message = `🍔 *${CONFIG.businessName} - Nuevo Pedido*\n\n`;
+  message += `📋 *Detalles del Pedido:*\n`;
+  message += `━━━━━━━━━━━━━━━\n\n`;
+  
+  cart.forEach(item => {
+    const product = CONFIG.products.find(p => p.id === item.id);
+    const itemTotal = product.price * item.quantity;
+    message += `${product.emoji} *${product.name}*\n`;
+    message += `   Cant: ${item.quantity} × ${CONFIG.currency}${product.price} = ${CONFIG.currency}${itemTotal}\n\n`;
+  });
+  
+  const subtotal = cart.reduce((sum, item) => {
+    const product = CONFIG.products.find(p => p.id === item.id);
+    return sum + (product.price * item.quantity);
+  }, 0);
+  
+  const total = subtotal + CONFIG.deliveryFee;
+  
+  message += `━━━━━━━━━━━━━━━\n`;
+  message += `💵 Subtotal: ${CONFIG.currency}${subtotal}\n`;
+  message += `🚚 Envío: ${CONFIG.currency}${CONFIG.deliveryFee}\n`;
+  message += `💰 *Total: ${CONFIG.currency}${total}*\n\n`;
+  message += `📱 Enviado desde el Menú Digital de Fulano Food`;
+  
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappURL = `https://wa.me/18096530608?text=${encodedMessage}`;
+  
+  window.open(whatsappURL, '_blank');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderCategories();
+  renderMenu();
+  updateCartButton();
+});
+</script>
+
+</body>
+</html>
